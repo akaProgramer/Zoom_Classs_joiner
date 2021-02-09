@@ -1,37 +1,28 @@
-#   a113_tower.py
-#   Modify this code in VS Code to alternate the colors of the 
-#   floors every three floors
-import turtle as trtl
+import telebot
+import tkinter
 
-painter = trtl.Turtle()
-painter.speed(0)
-painter.pensize(5)
+___version___ = "1.0"
+___name___ = "Reimagined Bot"
+root= tkinter.Tk()
+name= tkinter.Label(root,text="aribosdikek")
+name.pack()
+root.mainloop()
 
-# starting location of the tower
-x = -150
-y = -150
+bot = telebot.TeleBot("1440525329:AAFXSLKOADNCpLsL5KpAKTCrBcqAvOYAMkY")
 
-# height of tower and a counter for each floor
-num_floors = 63
-floor = 0
 
-# iterate
-color=0
-colors=["red","green","orange"]
-while floor < num_floors:
-  # set placement and color of turtle
-  painter.penup()
-  painter.goto(x, y)
-  painter.color(colors[color])
-  y = y + 5 # location of next floor
-  floor = floor + 1
-   
-  #draw the floor
-  painter.pendown()
-  painter.forward(50)
-  color=color+1
-  if color>=3:
-    color=0
+@bot.message_handler(regexp="\\+1([^\\w]|$)")
+def plus_one(message):
+    if message.chat.type == "group":
+        text_to_send = f"Message ID: {message.id}\nOriginal Message ID: {message.reply_to_message.id}"
+        bot.reply_to(message, text_to_send)
 
-wn = trtl.Screen()
-wn.mainloop()
+
+def main():
+    print(f"{___name___} Started, version {___version___}")
+    print(f"Bot username: @{bot.get_me().username}")
+    bot.polling()
+
+
+if __name__ == "__main__":
+    main()
