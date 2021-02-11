@@ -10,7 +10,8 @@ class GUI(tk.Tk):
         super().__init__()
         self.mydb= mysql.connector.connect(host="localhost", user="root", passwd="akash123#",database="akash")
         self.mycursor = self.mydb.cursor(buffered=True)
-        self.geometry("1700x750")
+        w, h = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.geometry("%dx%d+0+0" % (w, h))
         self.title("Zoom Automation and Stuff")
         # self.attributes("-alpha",0.8)
         self.frame= None
@@ -33,11 +34,20 @@ class GUI(tk.Tk):
         else:
             return False
 
+    def check_time_field(self,inp):
+        if len(inp)>12:
+            return False
+        elif inp.isnumeric() or ":" in inp:
+            return True
+        elif inp == "":
+            return True
+        else:
+            return False
+
     def check_zoom_id_field(self,inp):
         if len(inp)>15:
             return False
         elif inp.isnumeric() or " " in inp:
-
             return True
         elif inp == "":
             return True
@@ -108,7 +118,7 @@ class GUI(tk.Tk):
         self.zoom_password_Entry.config(validate="key",validatecommand=(reg3,'%P'))
         zoom_link_label= tk.Label(self.insert_frame,text="Zoom Link : ",bg="#ffffff",font="arialblack 12")
         zoom_link_label.grid(column=0,row=3,padx=(200,10),pady=10)
-        self.zoom_link_Entry= tk.Entry(self.insert_frame,font="arialblack 15")
+        self.zoom_link_Entry= tk.Entry(self.insert_frame,font="arialblack 12")
         self.zoom_link_Entry.grid(column=2,row=3,padx=(20,10),pady=10,ipady=3)
 
         zoom_timing_label = tk.Label(self.insert_frame, text="Timings (hh:mm:ss)",bg="#ffffff",font="arialblack 12")
@@ -117,10 +127,14 @@ class GUI(tk.Tk):
         zoom_from.grid(column=3,row=1,pady=10)
         self.zoom_from_entry= tk.Entry(self.insert_frame,font="arialblack 12")
         self.zoom_from_entry.grid(column=4,row=1,pady=10,ipady=3)
+        regt= self.insert_frame.register(self.check_time_field)
+        self.zoom_from_entry.config(validate="key",validatecommand=(regt,'%P'))
         zoom_to= tk.Label(self.insert_frame,text="To : ",bg="#ffffff",font="arialblack 12")
         zoom_to.grid(column=3,row=2,pady=10)
         self.zoom_to_entry= tk.Entry(self.insert_frame,font="arialblack 12")
         self.zoom_to_entry.grid(column=4,row=2,pady=10,ipady=3)
+        regtt= self.insert_frame.register(self.check_time_field)
+        self.zoom_to_entry.config(validate="key",validatecommand=(regtt,'%P'))
         submit_button= tk.Button(self.insert_frame,text="Submit",command=self.feed,font="arialblack 15",bg="#ffffff",cursor="hand2")
         submit_button.grid(row=5,column=1,pady=10)
         return self.insert_frame
@@ -216,7 +230,7 @@ class GUI(tk.Tk):
         self.zoom_password_Entry.config(validate="key",validatecommand=(reg3,'%P'))
         zoom_link_label= tk.Label(self.update_frame,text="Zoom Link :",bg="#ffffff",font="arialblack 12")
         zoom_link_label.grid(column=0,row=3,padx=(200,10),pady=10)
-        self.zoom_link_Entry= tk.Entry(self.update_frame,font="arialblack 15")
+        self.zoom_link_Entry= tk.Entry(self.update_frame,font="arialblack 12")
         self.zoom_link_Entry.grid(column=2,row=3,padx=(20,10),pady=10,ipady=3)
         
         zoom_timing_label = tk.Label(self.update_frame, text="Timings (hh:mm:ss)",bg="#ffffff",font="arialblack 12")
@@ -225,10 +239,14 @@ class GUI(tk.Tk):
         zoom_from.grid(column=3,row=1,pady=10)
         self.zoom_from_entry= tk.Entry(self.update_frame,font="arialblack 12")
         self.zoom_from_entry.grid(column=4,row=1,pady=10,ipady=3)
+        regt= self.update_frame.register(self.check_time_field)
+        self.zoom_from_entry.config(validate="key",validatecommand=(regt,'%P'))
         zoom_to= tk.Label(self.update_frame,text="To : ",bg="#ffffff",font="arialblack 12")
         zoom_to.grid(column=3,row=2,pady=10)
         self.zoom_to_entry= tk.Entry(self.update_frame,font="arialblack 12")
         self.zoom_to_entry.grid(column=4,row=2,pady=10,ipady=3)
+        regtt= self.update_frame.register(self.check_time_field)
+        self.zoom_to_entry.config(validate="key",validatecommand=(regtt,'%P'))
 
         self.retrieve_button= tk.Button(self.update_frame,text="Retrieve",command=self.extracted,bg="#ffffff",font="arialblack 15",cursor="hand2")
         self.retrieve_button.grid(column=1,row=4)
