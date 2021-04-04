@@ -2,10 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as tkm
 import mysql.connector
-
 from time import sleep
 import itertools
 class GUI(tk.Tk):
+    #initials
     def __init__(self):
         super().__init__()
         self.mydb= mysql.connector.connect(host="localhost", user="root", passwd="akash123#",database="akash")
@@ -13,8 +13,8 @@ class GUI(tk.Tk):
         w, h = self.winfo_screenwidth(), self.winfo_screenheight()
         self.geometry("%dx%d+0+0" % (w, h))
         self.title("Zoom Automation and Stuff")
-        # self.attributes("-alpha",0.8)
         self.frame= None
+        self.wm_iconbitmap("icon.ico")
     def swap_frame(self,new_frame):
         for item in self.table_data.selection():
             self.table_data.selection_remove(item)
@@ -22,7 +22,8 @@ class GUI(tk.Tk):
             self.frame.destroy()
         self.frame= new_frame
         self.frame.pack(expand=True,fill=tk.BOTH)
-
+    
+    #entry controls
     def check_subject_field(self,inp):
         if len(inp)>20:
             return False
@@ -66,7 +67,8 @@ class GUI(tk.Tk):
             return False
         
     
-    
+
+    #final insertion into database
     def feed(self):
         subject= self.subject_name_Entry.get()
         zoom_id= self.zoom_id_Entry.get()
@@ -93,7 +95,7 @@ class GUI(tk.Tk):
                 return
         else:
             tkm.showinfo("Insertion failed","either Subject, Zoom ID and Zoom Password or Subject, Zoom link should be filled")
-            
+    #insert frame       
     def insert(self):
         self.table_data.config(selectmode="none")
         self.insert_frame= tk.Frame(self.main_frame,bg="#ffffff")
@@ -138,7 +140,7 @@ class GUI(tk.Tk):
         submit_button= tk.Button(self.insert_frame,text="Submit",command=self.feed,font="arialblack 15",bg="#ffffff",cursor="hand2")
         submit_button.grid(row=5,column=1,pady=10)
         return self.insert_frame
-
+    #deletion in database
     def delete_record(self,table_data):
         selected_records= table_data.selection()
         print(selected_records)
@@ -154,6 +156,8 @@ class GUI(tk.Tk):
             tkm.showerror("Failed","No record selected")
         else:
             tkm.showinfo("Success","Selected items deleted")
+
+    #delete frame
     def delete(self):
         self.delete_frame= tk.Frame(self.main_frame,bg="#ffffff")
         self.table_data.config(selectmode="extended")
@@ -162,6 +166,7 @@ class GUI(tk.Tk):
         delete_button.pack(ipadx=40,ipady=2,pady=20)
         return self.delete_frame
         
+    #updation in database
     def updated(self):
         self.mycursor.execute("SELECT sno FROM ZOOM WHERE subject='"+self.values[0]+"'")
         no= self.mycursor.fetchone()
@@ -185,6 +190,8 @@ class GUI(tk.Tk):
             self.Update_button.config(state="disabled")
         except:
             tkm.showerror("Error","Duplicate Entry")
+
+    # exracting from database for updation 
     def extracted(self):
         self.current_record= self.table_data.focus()
         self.values= self.table_data.item(self.current_record,"values")
@@ -206,6 +213,7 @@ class GUI(tk.Tk):
         self.zoom_from_entry.insert(0,self.values[4])
         self.zoom_to_entry.insert(0,self.values[5])
 
+    #update frame
     def update(self):
         self.update_frame= tk.Frame(self.main_frame,bg="#ffffff")
         self.table_data.config(selectmode="browse")
@@ -254,50 +262,17 @@ class GUI(tk.Tk):
         self.Update_button= tk.Button(self.update_frame,text="Update",command=self.updated,state="disabled",bg="#ffffff",font="arialblack 15",cursor="hand2")
         self.Update_button.grid(column=2,row=4)
         return self.update_frame
-    def check_seq_field(self,inp):
-        if len(inp)>5:
-            return False
-        elif inp.isnumeric() or " " in inp:
-            return True
-        elif inp == "":
-            return True
-        else:
-            return False
-    def insert_seq(self,subjects,entries):
-        for entry,subject in zip(entries,subjects):
-            print(entry.get())
-            print(subject)
-            self.mycursor.execute("UPDATE ZOOM SET pno=%s WHERE subject=%s",(entry.get(),subject[0]))
-            self.mydb.commit()
-        tkm.showinfo("Success","Successfully updated")
-    def schedule(self):
-        self.schedule_frame= tk.Frame(self.main_frame,bg="#ffffff")
-        self.mycursor.execute("SELECT pno FROM zoom")
-        lec_no= self.mycursor.fetchall()
-        print(lec_no)
-        self.mycursor.execute("SELECT subject FROM zoom")
-        subjects= self.mycursor.fetchall()
-        entries= []
-        row=0
-        for subject,lec in zip(subjects,lec_no):
-            subject_name_label= tk.Label(self.schedule_frame,text=subject,bg="#ffffff",font="arialblack 10")
-            subject_name_label.grid(row=row,column=0,pady=7,padx=100)
-            self.subject_seq_Entry= tk.Entry(self.schedule_frame)
-            self.subject_seq_Entry.grid(row=row,column=2)
-            reg3= self.schedule_frame.register(self.check_seq_field)
-            self.subject_seq_Entry.config(validate="key",validatecommand=(reg3,'%P'))
-            self.subject_seq_Entry.insert(0,lec)
-            entries.append(self.subject_seq_Entry)
-            row=row+1
-        submit_button= tk.Button(self.schedule_frame,text="Submit",cursor="hand2",font="arialblack 15",command=lambda:self.insert_seq(subjects,entries))
-        submit_button.grid(row=row+1,column=1,pady=10)
-        return self.schedule_frame
+
+    # main GUI building function 
+
     def GUI_window(self):
         self.main_frame= tk.Frame(self,borderwidth=6,bg="#ffffff")
         head_frame= tk.Frame(self.main_frame)
-        main_heading= tk.Label(head_frame, text="Online Class Automation",font="arialblack 40 bold",bg="#2962FF",fg="white")
+        main_heading= tk.Label(head_frame, text="Zoom Automation",font="arialblack 40 bold",bg="#2962FF",fg="white")
         main_heading.pack(fill=tk.BOTH)
         head_frame.pack(fill=tk.BOTH,pady=(10,20))
+        
+        #tabs / buttons
 
         buttons_frame= tk.Frame(self.main_frame,bg="#ffffff")
         modify_button= tk.Button(buttons_frame,text="Update",font="black 20 bold",cursor="hand2",command=lambda:self.swap_frame(self.update()))
@@ -306,11 +281,10 @@ class GUI(tk.Tk):
         add_button.grid(ipadx=40,pady=10,padx=20,row=0,column=1)
         delete_button= tk.Button(buttons_frame, text="Delete",bg="#ff1414",font="black 20 bold",cursor="hand2",command=lambda: self.swap_frame(self.delete()))
         delete_button.grid(ipadx=40,pady=10,padx=20,row=0,column=2)
-        delete_button= tk.Button(buttons_frame, text="Schedule",font="black 20 bold",cursor="hand2",command=lambda: self.swap_frame(self.schedule()))
-        delete_button.grid(ipadx=40,pady=10,padx=20,row=0,column=3)
         buttons_frame.pack(pady=(10,10),fill=tk.X)
         
-        
+        #table formation
+
         table_frame= tk.Frame(self.main_frame)
         table_scrollbar=tk.Scrollbar(table_frame)
         table_scrollbar.pack(side="right",fill="y")
